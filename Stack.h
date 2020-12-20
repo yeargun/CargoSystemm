@@ -29,7 +29,7 @@ public:
 	//Pop: Remove item from the top of the stack
 	void pop();
 	void printWhole();
-
+private:
 	struct ListNode {
 		T item;
 		ListNode* next;
@@ -66,7 +66,6 @@ template <typename T>
 void Stack<T>::printWhole(){
     for(ListNode* temp = top;temp!= NULL;temp=temp->next)
         output<<temp->item->getName()<<endl;
-
 }
 
 
@@ -95,7 +94,6 @@ void Stack<T>::getTop(T& stackTop) const{
         return;
     }
     stackTop = top->item;
-    //cout<<"top->item "<<top->item->getName()<<endl;
 }
 
 template <typename T>
@@ -114,7 +112,6 @@ void Stack<T>::pop(){
         top = tempNode;
         this->_size--;
     }
-
 }
 
 

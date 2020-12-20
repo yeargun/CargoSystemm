@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <algorithm>
 #include "Station.cpp"
 
 using namespace std;
@@ -12,15 +11,6 @@ string charArrayToString(char* a, int size) { //
         s += a[i];
     }
     return s;
-}
-bool strCompare(string s1, string s2, int compareLength) { // returns true if strings are identical
-    if (compareLength > s1.length() || compareLength > s2.length()) { return false; }
-    for (int i = 0; i < compareLength; i++) {
-        if (s1[i] != s2[i]) {
-            return false;
-        }
-    }
-    return true;
 }
 string stringSplitter(const string* string1, const char parameter, int index) { // splits the string by the given parameter
 //and returns the preffered indexed string from splitted strings
@@ -48,7 +38,7 @@ void setPackages(ifstream* packages, vector<Station*>* stations) {
     string command;
     string initialPosition;
     string packageName;
-    for (command; getline(*packages, command); ) {
+    for (command; getline(*packages, command);) {
         packageName = stringSplitter(&command,' ',0);
         initialPosition = stringSplitter(&command,' ',1);
         Packages* newPackage;
@@ -61,11 +51,6 @@ void setPackages(ifstream* packages, vector<Station*>* stations) {
         }
     }
 }
-bool contains(vector<int> v,int x){
-    if(find(v.begin(), v.end(), x) != v.end())
-        return true;
-    return false;
-    }
 void setDests(ifstream* dests, vector<Station*>* stations) {
     string command;
     Station* newStation;
@@ -74,8 +59,6 @@ void setDests(ifstream* dests, vector<Station*>* stations) {
         stations->push_back(newStation);
     }
 }
-
-
 void setTrucks(ifstream* trucks, vector<Station*>* stations){
     string command;
     string initialPosition;string truckName;string power;
@@ -93,10 +76,7 @@ void setTrucks(ifstream* trucks, vector<Station*>* stations){
     }
 }
 
-
-
-
-//_packages is for moving truck and its' packages
+//_packages class is for moving truck and its' packages
 class _packages{
 public:
     static _packages* head;
@@ -137,6 +117,7 @@ public:
         }
         return NULL;
     }
+
     void printWhole(){
         _packages* temp=head;
         if(head==NULL){
@@ -152,20 +133,10 @@ public:
             return true;
         return false;
     }
-    int size(){
-        int i = 0;
-        for(_packages* temp=head;temp!=NULL;temp=temp->next){
-            i++;
-        }
-        return i-1;
-    }
 };
 _packages* movingTruck = new _packages;
 _packages* _packages::head = new _packages;
 
-
-//gets the first truck from given station
-//gets the packages from first station
 void firstStationToMiddle(vector<Station*>* stations,int x,string startingStation){
     Truck* tempTruck;
     Packages* tempPackage;
@@ -178,9 +149,9 @@ void firstStationToMiddle(vector<Station*>* stations,int x,string startingStatio
             }
             station->trucks.dequeue();
             movingTruck = new _packages(tempTruck);
-//          getting packages from first station
+
+            //getting packages from first station
             for(int i=0;i<x;i++){
-//               station->packages.printWhole();
                 station->packages.getTop(tempPackage);
                 if(tempPackage==NULL){
                     cout<<"There's no enough package in first statin\n";
@@ -189,46 +160,19 @@ void firstStationToMiddle(vector<Station*>* stations,int x,string startingStatio
                 station->packages.pop();
                 movingTruck->addPackage(tempPackage);
             }
-//           break;
         }
     }
 
 }
-
-
-
-
-void moveTruck(string* command, vector<Station*>* stations){
-    string startingStation = stringSplitter(command,'-',0);
-    string middleStation = stringSplitter(command,'-',1);
-    string endStation = stringSplitter(command,'-',2);
-    int x = stoi(stringSplitter(command,'-',3));
-    int y = stoi(stringSplitter(command,'-',4));
-    const string zValues = stringSplitter(command,'-',5);
+void addAndReleasePacksToMiddle(vector<Station*>* stations, int y, string middleStation,string zValues){
     Truck* tempTruck;
     Packages* tempPackage;
-
-
-    firstStationToMiddle(stations,x,startingStation);
-
-
-
-
-
-
-    cout<<"\n\nAfter getting packages from first station\n";
-    movingTruck->printWhole();
-//
-//
-//
-    //adding packages from middle station to moving truck
     for(Station* station: *stations){
         if(station->gettName()== middleStation){
-            for(int i=0;i<y;i++){
-                cout<<i<<endl;
+            for(int i=0;i<y;i++){//getting packages from middle station
                 tempPackage = new Packages();
                 if(tempPackage==NULL){
-                    cout<<"you cant get that much package from that station\n";
+                    cout<<"You cant get that much package from that station\n";
                     return;
                 }
                 station->packages.getTop(tempPackage);
@@ -236,16 +180,11 @@ void moveTruck(string* command, vector<Station*>* stations){
                 movingTruck->addPackage(tempPackage);
             }
 
-            cout<<"After adding packages from middle station\n";
-            movingTruck->printWhole();
-
-
             //releasing the given indeces of packages to middle station
             int iThZvalue;
             vector<int> zvalues;
             vector<string> removedPackageNames;
             _packages* tempNode= movingTruck->head->next;
-            _packages* copyTruck = new _packages();
             for(int i=0;;i++){ //seperating the z indices at string
                 if(stringSplitter(&zValues,',',i) == "NULL"){
                     break;
@@ -258,19 +197,14 @@ void moveTruck(string* command, vector<Station*>* stations){
                 for(int k= 0;k<i;k++){
                     tempNode=tempNode->next;
                     if(tempNode==NULL){
-                        cout<<"given index to removve from middle station is too big .. \n";
                         break;
                     }
                 }
                 removedPackageNames.push_back(tempNode->data->getName());
             }
             for(string packageName : removedPackageNames){
-                //cout<<"to be removed package name-> "<<packageName<<endl;
                 for(tempNode = movingTruck->head->next; tempNode!=NULL ; tempNode=tempNode->next){
-
-                //for(tempNode = movingTruck->head->next; tempNode->next!=NULL && tempNode!=NULL;tempNode = tempNode->next){
                     if(tempNode->data->getName() == packageName){
-                        //cout<<"This get removed from truck to middle station -> "<<packageName<<endl;
                         if(tempNode->next==NULL & tempNode->prev==movingTruck->head){//if there s only 1 package in truck
                             movingTruck->head->next = NULL;
                         }
@@ -285,31 +219,46 @@ void moveTruck(string* command, vector<Station*>* stations){
                     }
                 }
             }
-           break;
+            break;
         }
     }
-    cout<<"after releasing packages to middle station\n";
-    movingTruck->printWhole();
-
-    //moving truck reachs the final destination
-        //we put truck to garage & we put packages to stack
+}
+void releasingToFinalStation(vector<Station*>* stations,string endStation){
     for(Station* station: *stations) {
         if (station->gettName() == endStation) {
             while(!movingTruck->isEmpty()){
                 station->packages.push(
                         movingTruck->popPackage(0) );
-                       // movingTruck->popPackage(0);
-                       // movingTruck->popPackage(0);
             }
             Truck* truck = static_cast<Truck *>(movingTruck->head->data);
-            //cout<<"this truck enters last station garage "<<truck->getName()<<endl;
             station->trucks.enqueue(truck);
             delete movingTruck;
             break;
         }
     }
 }
-void finalStations(vector<Station*>* stations){
+
+void moveTruck(string* command, vector<Station*>* stations){
+    string startingStation = stringSplitter(command,'-',0);
+    string middleStation = stringSplitter(command,'-',1);
+    string endStation = stringSplitter(command,'-',2);
+    int x = stoi(stringSplitter(command,'-',3));
+    int y = stoi(stringSplitter(command,'-',4));
+    const string zValues = stringSplitter(command,'-',5);
+
+    //gets the first truck from given station
+    //gets the packages from first station
+    firstStationToMiddle(stations,x,startingStation);
+
+    //gets y packages from middle station
+    //and releases the indexes inside zValues
+    addAndReleasePacksToMiddle(stations,y,middleStation,zValues);
+
+    //moving truck reachs the final destination
+    //we put truck to garage & we put packages to stack
+    releasingToFinalStation(stations,endStation);
+}
+void printStations(vector<Station*>* stations){
     for(Station* station: *stations){
         output<<station->gettName()<<endl;
         output<<"Packages:\n";
@@ -321,36 +270,26 @@ void finalStations(vector<Station*>* stations){
 }
 
 
-
-
 int main(int argc, char* argv[]) {
-    //desk1,package2,truck3,mission4,result5
+    //argument order desk,package,truck,mission,result
     string command;
     ifstream dests, packages, trucks, missions;
-    dests.open("dests.txt");
-    packages.open("packages.txt");
-    trucks.open("trucks.txt");
-    missions.open("missions.txt");
-    output.open("myOut.txt");
+    dests.open(argv[1]);
+    packages.open(argv[2]);
+    trucks.open(argv[3]);
+    missions.open(argv[4]);
+    output.open(argv[5]);
     vector<Station*> stations;
-
 
     setDests(&dests,&stations);
     setTrucks(&trucks,&stations);
     setPackages(&packages,&stations);
 
-
-
     //getting missions
     for (command; getline(missions, command); ) {
-        //cout << command << endl;
-       // finalStations(&stations);
         moveTruck(&command,&stations);
-        //finalStations(&stations);
     }
-    finalStations(&stations);
-
-
+    printStations(&stations);
     output.close();
     return 0;
 }

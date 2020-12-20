@@ -1,23 +1,18 @@
 #include <iostream>
 
 class Packages{
+private:
+    std::string name;
 public:
-    Packages(){
-
-    }
+    Packages(){}
     Packages(std::string name){
         this->name=name;
     }
-    ~Packages(){
-
-    }
+    ~Packages(){}
     std::string getName() const{
         return this->name;
     }
     void setName(std::string name){
         this->name=name;
     }
-
-private:
-    std::string name;
 };

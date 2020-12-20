@@ -28,14 +28,14 @@ public:
 	void dequeue();
 	//Get Front: Take a look at the first item
 	void getFront(T& queueTop) const;
-    struct QueueNode {
+private:
+	struct QueueNode {
         T item;
         QueueNode* next;
         QueueNode(){
             this->next=NULL;
         }
     };
-
     int _size;
 	/* to avoid the traversal to the last node,
 	 an additional pointer to the last node is defined*/
@@ -44,11 +44,9 @@ public:
 };
 
 
-
 template <typename T>
 Queue<T>::~Queue<T>(){
     _size = 0;
-
 }
 
 template <typename T>
@@ -57,7 +55,6 @@ void Queue<T>::printWhole(){
     if(temp == NULL){
         return;
     }
-    //cout<<"queue size "<<this->_size<<endl;
     while(temp!=NULL && temp->item !=NULL){
         output << temp->item->getName()<<endl;
         temp = temp->next;
@@ -67,7 +64,6 @@ void Queue<T>::printWhole(){
 template <typename T>
 Queue<T>::Queue() {
     this->_size = 0;
-
 }
 
 template <typename T>
@@ -75,7 +71,6 @@ bool Queue<T>::isEmpty() const {
     if(this->size() == 0)
         return true;
     return false;
-
 }
 
 template <typename T>
@@ -83,7 +78,7 @@ int Queue<T>::size() const {
     return _size;
 }
 
-//Enqueue: Items are added to the back of the queue
+
 template <typename T>
 void Queue<T>::enqueue(const T& newItem) {
     if(this->isEmpty()){
@@ -103,8 +98,6 @@ void Queue<T>::enqueue(const T& newItem) {
     this->_size++;
 }
 
-
-//Dequeue: Items are removed from the front of the queue
 template <typename T>
 void Queue<T>::dequeue() {
     if(this->_size <1){
@@ -127,13 +120,12 @@ void Queue<T>::dequeue() {
     this->_size--;
 }
 
-//Get Front: Take a look at the first item
+
 template <typename T>
 void Queue<T>::getFront(T& queueTop) const {
     if(!isEmpty())
         queueTop = this->_headNode->item;
 }
-
 
 
 #endif

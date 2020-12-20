@@ -2,6 +2,7 @@
 
 using namespace std;
 
+
 class Truck : public Packages {
     string motorPower;
     string position;
@@ -10,20 +11,7 @@ public:
         this->motorPower=power;
         this->position=position;
     }
-
-    string getMotorPower(){
-        return  this->motorPower;
-    }
     string getName(){
         return Packages::getName();
     }
-    struct node{
-        Packages* package;
-        node* nextNode;
-        node* prevNode;
-    };
-    node* head;
-    node* tail;
-
-
 };
