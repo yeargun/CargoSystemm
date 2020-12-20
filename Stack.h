@@ -104,10 +104,17 @@ void Stack<T>::pop(){
         cout<<"theres nothing to pop, stack is empty\n";
         return;
     }
-    ListNode* tempNode = top->next;
-    delete top;
-    top = tempNode;
-    this->_size--;
+    else if(top->next==NULL){
+        top=NULL;
+        _last = NULL;
+    }
+    else{
+        ListNode* tempNode = top->next;
+        delete top;
+        top = tempNode;
+        this->_size--;
+    }
+
 }
 
 

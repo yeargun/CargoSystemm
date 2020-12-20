@@ -54,7 +54,7 @@ void setPackages(ifstream* packages, vector<Station*>* stations) {
         Packages* newPackage;
         for(auto station: *stations){
             if(station->gettName()== initialPosition){
-                //cout<<packageName<<" has been added to "<<initialPosition<<endl;
+
                 newPackage = new Packages(packageName);
                 station->packages.push(newPackage);
             }
@@ -86,14 +86,11 @@ void setTrucks(ifstream* trucks, vector<Station*>* stations){
         power = stringSplitter(&command,' ',2);
         for(Station* station: *stations){
             if(station->gettName()== initialPosition){
-               //cout<< station->gettName()<< " this station get this truck -->"<<truckName<<endl;
                tempTruck = new Truck(truckName, truckName, initialPosition, power);
                station->trucks.enqueue(tempTruck);
-              // cout<<"aaaaa "<<station->trucks._lastNode->item->getMotorPower()<<endl;
             }
         }
     }
-
 }
 
 
@@ -103,22 +100,17 @@ void setTrucks(ifstream* trucks, vector<Station*>* stations){
 class _packages{
 public:
     static _packages* head;
-    static _packages* headCopy;
     Packages* data;
     _packages* next;
     _packages* prev;
 
-    _packages(){
-    }
-    _packages(Truck* truck){
+    _packages(){}
+    _packages(Truck* truck){//we use _packages to implement moving truck
+        //when we initialize the object with a truck object. This constructor puts the truck* to head
         this->head = new _packages;
         this->head->data = truck;
         this->head->next= NULL;
         this->head->prev = NULL;
-        this->headCopy = new _packages;
-        this->headCopy->data = truck;
-        this->headCopy->next= NULL;
-        this->headCopy->prev = NULL;
     }
 
     void addPackage(Packages* newPackage){
@@ -130,58 +122,26 @@ public:
         tempPackage->next->next = NULL;
     }
 
-    void addToCopy(Packages* newPackage){
-        _packages* tempPackage = this->headCopy;
-        for(; tempPackage->next!=NULL;tempPackage=tempPackage->next){}
-        tempPackage->next = new _packages();
-        tempPackage->next->data = newPackage;
-        tempPackage->next->prev = tempPackage;
-        tempPackage->next->next = NULL;
-    }
-
-    void copyPackages(Packages* newPackage){
-        _packages* tempPackage = this;
-        if(tempPackage==NULL){
-            tempPackage->data = newPackage;
-            tempPackage->prev=NULL;
-            tempPackage->next=NULL;
-            return;
-        }
-        for(; tempPackage->next!=NULL;tempPackage=tempPackage->next){}
-        tempPackage->next = new _packages();
-        tempPackage->next->data = newPackage;
-        tempPackage->next->prev = tempPackage;
-        tempPackage->next->next = NULL;
-        cout<<"copypackage ici "<<tempPackage->next->data->getName()<<endl;
-    }
-
     Packages* popPackage(int index){
         _packages* tempPackage = this->head;
         for(int i=-1; tempPackage!=NULL;tempPackage=tempPackage->next, i++){
             if(i==index){
-               // cout<<"bunu popladim -> "<<tempPackage->data->getName()<<endl;
                 tempPackage->prev->next = tempPackage->next;
                 //if the element that we wanna pop isnt at the end of the list
-                //we fix the pointer of next element
+                //we change next nodes prev
                 if(tempPackage->next!=NULL){
                     tempPackage->next->prev = tempPackage->prev;
                 }
                 return tempPackage->data;
-                return tempPackage->data;
             }
         }
-       // cout<<"given index("<<index<<") is bigger than whole truck \n";
         return NULL;
     }
-
-
     void printWhole(){
         _packages* temp=head;
         if(head==NULL){
-            cout<<"movingtruck empty\n";
             return;
         }
-
         for(;temp!=NULL;temp=temp->next){
             cout<<temp->data->getName() <<" ";
         }
@@ -200,10 +160,41 @@ public:
         return i-1;
     }
 };
-
 _packages* movingTruck = new _packages;
 _packages* _packages::head = new _packages;
-_packages* _packages::headCopy = new _packages;
+
+
+//gets the first truck from given station
+//gets the packages from first station
+void firstStationToMiddle(vector<Station*>* stations,int x,string startingStation){
+    Truck* tempTruck;
+    Packages* tempPackage;
+    for(Station* station: *stations){
+        if(station->gettName()== startingStation){
+            station->trucks.getFront(tempTruck);
+            if(tempTruck==NULL){
+                cout<<"There's no truck to be used in this station("<<station->gettName()<<")\n";
+                return;
+            }
+            station->trucks.dequeue();
+            movingTruck = new _packages(tempTruck);
+//          getting packages from first station
+            for(int i=0;i<x;i++){
+//               station->packages.printWhole();
+                station->packages.getTop(tempPackage);
+                if(tempPackage==NULL){
+                    cout<<"There's no enough package in first statin\n";
+                    return;
+                }
+                station->packages.pop();
+                movingTruck->addPackage(tempPackage);
+            }
+//           break;
+        }
+    }
+
+}
+
 
 
 
@@ -218,39 +209,13 @@ void moveTruck(string* command, vector<Station*>* stations){
     Packages* tempPackage;
 
 
+    firstStationToMiddle(stations,x,startingStation);
 
 
 
 
-    //gets the first truck from given station
-        //gets the packages from first station
-    for(Station* station: *stations){
-        if(station->gettName()== startingStation){
-            station->trucks.getFront(tempTruck);
-            if(tempTruck==NULL){
-                cout<<"There s no truck to be used in this station("<<station->gettName()<<")\n";
-                return;
-            }
-            station->trucks.dequeue();
-           // cout<<"sdgfsfdsds"<<tempTruck->getName()<<" and power "<<tempTruck->getMotorPower()<<endl;
-            movingTruck = new _packages(tempTruck);
-           // cout<<"movingtruck in truck i "<<movingTruck->head->data->getName()<<endl;
-//           //getting packages from first station
-            for(int i=0;i<x;i++){
-//               station->packages.printWhole();
-                station->packages.getTop(tempPackage);
-                if(tempPackage==NULL){
-                    cout<<"you cant get that much package from that station\n";
-                    return;
-                }
-                station->packages.pop();
-                movingTruck->addPackage(tempPackage);
-                cout<<"you have been addded this package to moving truck("<< movingTruck->head->data->getName()<<")-> "<<tempPackage->getName()<<endl;
-            }
-//           break;
-        }
-    }
-    return;
+
+
     cout<<"\n\nAfter getting packages from first station\n";
     movingTruck->printWhole();
 //
@@ -300,9 +265,12 @@ void moveTruck(string* command, vector<Station*>* stations){
                 removedPackageNames.push_back(tempNode->data->getName());
             }
             for(string packageName : removedPackageNames){
-                for(tempNode = movingTruck->head->next; tempNode->next!=NULL && tempNode!=NULL;tempNode = tempNode->next){
+                //cout<<"to be removed package name-> "<<packageName<<endl;
+                for(tempNode = movingTruck->head->next; tempNode!=NULL ; tempNode=tempNode->next){
+
+                //for(tempNode = movingTruck->head->next; tempNode->next!=NULL && tempNode!=NULL;tempNode = tempNode->next){
                     if(tempNode->data->getName() == packageName){
-                        cout<<"This get removed from truck to middle station -> "<<packageName<<endl;
+                        //cout<<"This get removed from truck to middle station -> "<<packageName<<endl;
                         if(tempNode->next==NULL & tempNode->prev==movingTruck->head){//if there s only 1 package in truck
                             movingTruck->head->next = NULL;
                         }

@@ -31,6 +31,9 @@ public:
     struct QueueNode {
         T item;
         QueueNode* next;
+        QueueNode(){
+            this->next=NULL;
+        }
     };
 
     int _size;
@@ -45,7 +48,7 @@ public:
 template <typename T>
 Queue<T>::~Queue<T>(){
     _size = 0;
-    
+
 }
 
 template <typename T>
@@ -54,7 +57,7 @@ void Queue<T>::printWhole(){
     if(temp == NULL){
         return;
     }
-    cout<<"queue size "<<this->_size<<endl;
+    //cout<<"queue size "<<this->_size<<endl;
     while(temp!=NULL && temp->item !=NULL){
         output << temp->item->getName()<<endl;
         temp = temp->next;
@@ -109,9 +112,17 @@ void Queue<T>::dequeue() {
         return;
     }
     else{
-        QueueNode* tempNode = _headNode->next;
-        delete _headNode;
-        _headNode = tempNode;
+        if(_headNode==NULL){
+            cout<<"???\n";
+            return;
+        }
+        else if(_headNode->next==NULL){
+            _headNode=NULL;
+            _lastNode=NULL;
+        }
+        else{
+            _headNode = _headNode->next;
+        }
     }
     this->_size--;
 }
@@ -121,7 +132,6 @@ template <typename T>
 void Queue<T>::getFront(T& queueTop) const {
     if(!isEmpty())
         queueTop = this->_headNode->item;
-
 }
 
 
